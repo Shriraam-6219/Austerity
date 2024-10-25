@@ -61,32 +61,26 @@ const Home = () => {
     }
 };
   const downloadPDF = async () => {
-    const initialView = view; // Save the initial value of view
-  
-    // Change the view to "both"
+    const initialView = view;
     setView("both");
-  
-    // Ensure the DOM updates with the new view before proceeding
     await new Promise((resolve) => setTimeout(resolve, 0));
-  
+
     const input = pdfRef.current;
     html2canvas(input).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4', true); // Initialize jsPDF
+      const pdf = new jsPDF('p', 'mm', 'a4', true);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
   
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
   
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight); // Calculate scaling ratio
-      const imgX = (pdfWidth - imgWidth * ratio) / 2; // Center image horizontally
-      const imgY = 30; // Set Y position
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 30;
   
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save('invoice.pdf'); // Save the PDF
-  
-      // Revert the view to its initial value after saving the PDF
+      pdf.save('invoice.pdf');
       setView(initialView);
     });
   };
@@ -245,7 +239,7 @@ const Home = () => {
   };
 
   const handleChartClick = (e) => {
-    setView("chart");
+    setView("analytics");
   };
 
   return (
@@ -306,7 +300,7 @@ const Home = () => {
                   sx={{ cursor: "pointer" }}
                   onClick={handleChartClick}
                   className={`${
-                    view === "chart" ? "iconActive" : "iconDeactive"
+                    view === "analytics" ? "iconActive" : "iconDeactive"
                   }`}
                 />
               </div>
@@ -455,7 +449,7 @@ const Home = () => {
               <></>
             )}
 
-            <div className="containerBtn">
+            <div className="containerBtn d-flex justify-content-center">
               <Button variant="primary" onClick={handleReset}>
                 Reset Filter
               </Button>
@@ -476,9 +470,17 @@ const Home = () => {
                 </>
               ) : null}
             </div>
+<<<<<<< Updated upstream
             <button className="btn btn-primary center" onClick={downloadPDF}>Download PDF</button>
             <button className="btn btn-primary center " onClick={sendSms} style={{marginLeft:'3rem'}}>Send Sms</button>
 
+=======
+            <div className="d-flex justify-content-center">
+                <button className="btn btn-primary" onClick={downloadPDF}>
+                    Download PDF
+                </button>
+            </div>
+>>>>>>> Stashed changes
             <ToastContainer />
           </Container>
         </>
