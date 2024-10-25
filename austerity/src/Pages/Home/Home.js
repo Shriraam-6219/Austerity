@@ -239,7 +239,7 @@ const Home = () => {
   };
 
   const handleChartClick = (e) => {
-    setView("analytics");
+    setView("chart");
   };
 
   return (
@@ -300,7 +300,7 @@ const Home = () => {
                   sx={{ cursor: "pointer" }}
                   onClick={handleChartClick}
                   className={`${
-                    view === "analytics" ? "iconActive" : "iconDeactive"
+                    view === "chart" ? "iconActive" : "iconDeactive"
                   }`}
                 />
               </div>
