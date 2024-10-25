@@ -410,17 +410,17 @@ const Home = () => {
                 Reset Filter
               </Button>
             </div>
+            <div ref={pdfRef}>
             {view === "table" ? (
               <>
-                <div ref={pdfRef}>
                 <TableData data={transactions} user={cUser} />
-                </div>
               </>
             ) : (
               <>
                 <Analytics transactions={transactions} user={cUser} />
               </>
             )}
+            </div>
             <button className="btn btn-primary center" onClick={downloadPDF}>Download PDF</button>s
             <ToastContainer />
           </Container>

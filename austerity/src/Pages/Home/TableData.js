@@ -92,7 +92,7 @@ const TableData = (props) => {
   return (
     <>
       <Container>
-        <Table responsive="md" className="data-table">
+        <Table responsive="md" className="data-table bg-black">
           <thead>
             <tr>
               <th>Date</th>
