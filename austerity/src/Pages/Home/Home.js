@@ -18,10 +18,48 @@ import "react-datepicker/dist/react-datepicker.css";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import Analytics from "./Analytics";
+import { sendMail } from "../../utils/ApiRequest";
 
 const Home = () => {
   const navigate = useNavigate();
   const pdfRef = useRef();
+
+  const sendSms = async () => {
+    try {
+        // Get the user object from localStorage and extract the user ID
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || !user._id) {
+            alert("User not found. Please log in.");
+            return;
+        }
+
+        const userId = user._id;
+
+        // Send the user ID to the backend
+        const response = await fetch(sendMail, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId, email: user.email }) // Include the user's email if required
+        });
+
+        // Parse the response
+        const data = await response.json();
+
+        // Handle the response based on the status
+        if (response.ok) {
+            alert(data.message || "Mail sent successfully!");
+        } else {
+            // If the backend returned an error message, display it
+            alert(data.error || "An error occurred while sending SMS.");
+        }
+    } catch (error) {
+        // Catch any network or parsing errors
+        console.error("Error sending SMS:", error);
+        alert("Failed to send Mail. Please try again.");
+    }
+};
   const downloadPDF = async () => {
     const initialView = view; // Save the initial value of view
   
@@ -427,7 +465,7 @@ const Home = () => {
                 <>
                   <TableData data={transactions} user={cUser} />
                 </>
-              ) : view === "analytics" ? (
+              ) : view === "chart" ? (
                 <>
                   <Analytics transactions={transactions} user={cUser} />
                 </>
@@ -438,7 +476,9 @@ const Home = () => {
                 </>
               ) : null}
             </div>
-            <button className="btn btn-primary center" onClick={downloadPDF}>Download PDF</button>s
+            <button className="btn btn-primary center" onClick={downloadPDF}>Download PDF</button>
+            <button className="btn btn-primary center " onClick={sendSms} style={{marginLeft:'3rem'}}>Send Sms</button>
+
             <ToastContainer />
           </Container>
         </>
