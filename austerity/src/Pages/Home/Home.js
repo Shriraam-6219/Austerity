@@ -401,6 +401,7 @@ const Home = () => {
                   <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                       Close
+                      
                     </Button>
                     <Button variant="primary" onClick={handleSubmit}>
                       Submit
