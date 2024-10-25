@@ -17,7 +17,7 @@ const port =5000;
 connectDB();
 
 const allowedOrigins = [
-  "http://localhost:3000",'http://192.168.175.130:3000'
+  "http://localhost:3000",'http://192.168.175.130:3000','https://austerity-expense.netlify.app/'
   // add more origins as needed
 ];
 
