@@ -22,7 +22,15 @@ import Analytics from "./Analytics";
 const Home = () => {
   const navigate = useNavigate();
   const pdfRef = useRef();
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
+    const initialView = view; // Save the initial value of view
+  
+    // Change the view to "both"
+    setView("both");
+  
+    // Ensure the DOM updates with the new view before proceeding
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  
     const input = pdfRef.current;
     html2canvas(input).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
@@ -32,15 +40,19 @@ const Home = () => {
   
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-      
+  
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight); // Calculate scaling ratio
       const imgX = (pdfWidth - imgWidth * ratio) / 2; // Center image horizontally
       const imgY = 30; // Set Y position
   
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       pdf.save('invoice.pdf'); // Save the PDF
+  
+      // Revert the view to its initial value after saving the PDF
+      setView(initialView);
     });
   };
+  
   const toastOptions = {
     position: "bottom-right",
     autoClose: 2000,
@@ -412,14 +424,19 @@ const Home = () => {
             </div>
             <div ref={pdfRef}>
             {view === "table" ? (
-              <>
-                <TableData data={transactions} user={cUser} />
-              </>
-            ) : (
-              <>
-                <Analytics transactions={transactions} user={cUser} />
-              </>
-            )}
+                <>
+                  <TableData data={transactions} user={cUser} />
+                </>
+              ) : view === "analytics" ? (
+                <>
+                  <Analytics transactions={transactions} user={cUser} />
+                </>
+              ) : view === "both" ? (
+                <>
+                  <TableData data={transactions} user={cUser} />
+                  <Analytics transactions={transactions} user={cUser} />
+                </>
+              ) : null}
             </div>
             <button className="btn btn-primary center" onClick={downloadPDF}>Download PDF</button>s
             <ToastContainer />
