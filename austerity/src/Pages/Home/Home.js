@@ -470,17 +470,16 @@ const Home = () => {
                 </>
               ) : null}
             </div>
-<<<<<<< Updated upstream
-            <button className="btn btn-primary center" onClick={downloadPDF}>Download PDF</button>
-            <button className="btn btn-primary center " onClick={sendSms} style={{marginLeft:'3rem'}}>Send Sms</button>
 
-=======
+
             <div className="d-flex justify-content-center">
-                <button className="btn btn-primary" onClick={downloadPDF}>
-                    Download PDF
-                </button>
+              <button className="btn btn-primary" onClick={downloadPDF}>
+                Download PDF
+              </button>
+              <button className="btn btn-primary center " onClick={sendSms} style={{marginLeft:'3rem'}}>
+                Send SMS
+              </button>
             </div>
->>>>>>> Stashed changes
             <ToastContainer />
           </Container>
         </>
