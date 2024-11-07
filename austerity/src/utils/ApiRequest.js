@@ -1,4 +1,4 @@
-const host = "https://austeriy-backend.onrender.com";
+const host = "http://localhost:5000";
 export const setAvatarAPI = `${host}/api/auth/setAvatar`;
 export const registerAPI = `${host}/api/auth/register`;
 export const loginAPI = `${host}/api/auth/login`;

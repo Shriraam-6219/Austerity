@@ -17,8 +17,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import Analytics from "./Analytics";
 import { sendMail } from "../../utils/ApiRequest";
+import RecurringPaymentsTable from "./RecurringPaymentsTable";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -241,6 +243,11 @@ const Home = () => {
   const handleChartClick = (e) => {
     setView("chart");
   };
+  const handleRPayClick = (e) => {
+    setView("rpay");
+  };
+
+  
 
   return (
     <>
@@ -303,6 +310,13 @@ const Home = () => {
                     view === "chart" ? "iconActive" : "iconDeactive"
                   }`}
                 />
+                <AllInclusiveIcon
+                  sx={{ cursor: "pointer" }}
+                  onClick={handleRPayClick}
+                  className={`${
+                    view === "rpay" ? "iconActive" : "iconDeactive"
+                  }`}
+                />                
               </div>
 
               <div>
@@ -463,6 +477,10 @@ const Home = () => {
               ) : view === "chart" ? (
                 <>
                   <Analytics transactions={transactions} user={cUser} />
+                </>
+              ) : view === "rpay" ? (
+                <>
+                  <RecurringPaymentsTable/>
                 </>
               ) : view === "both" ? (
                 <>
