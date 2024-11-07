@@ -7,7 +7,7 @@ import { Button, Modal, Form, Container } from "react-bootstrap";
 import "./home.css";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { addTransaction, getTransactions } from "../../utils/ApiRequest";
+import { addTransaction, getTransactions,addRecurringPayment } from "../../utils/ApiRequest";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,40 +28,46 @@ const Home = () => {
 
   const sendSms = async () => {
     try {
-        // Get the user object from localStorage and extract the user ID
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (!user || !user._id) {
-            alert("User not found. Please log in.");
-            return;
-        }
+      setLoading(true);
+      // Get the user object from localStorage and extract the user ID
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user || !user._id) {
+        alert("User not found. Please log in.");
+        return;
+      }
 
-        const userId = user._id;
+      const userId = user._id;
 
-        // Send the user ID to the backend
-        const response = await fetch(sendMail, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId, email: user.email }) // Include the user's email if required
-        });
+      // Send the user ID to the backend
+      const response = await fetch(sendMail, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, email: user.email }) // Include the user's email if required
+      });
 
-        // Parse the response
-        const data = await response.json();
+      // Parse the response
+      const data = await response.json();
 
-        // Handle the response based on the status
-        if (response.ok) {
-            alert(data.message || "Mail sent successfully!");
-        } else {
-            // If the backend returned an error message, display it
-            alert(data.error || "An error occurred while sending SMS.");
-        }
+      // Handle the response based on the status
+      if (response.ok) {
+        toast.success("Mail Send Successfully!", toastOptions);
+
+
+        // alert(data.message || "Mail sent successfully!");
+      } else {
+        // If the backend returned an error message, display it
+        alert(data.error || "An error occurred while sending SMS.");
+      }
     } catch (error) {
-        // Catch any network or parsing errors
-        console.error("Error sending SMS:", error);
-        alert("Failed to send Mail. Please try again.");
+      // Catch any network or parsing errors
+      console.error("Error sending SMS:", error);
+      alert("Failed to send Mail. Please try again.");
+    } finally {
+      setLoading(false);
     }
-};
+  };
   const downloadPDF = async () => {
     const initialView = view;
     setView("both");
@@ -73,20 +79,29 @@ const Home = () => {
       const pdf = new jsPDF('p', 'mm', 'a4', true);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-  
+
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
-  
+
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
       const imgX = (pdfWidth - imgWidth * ratio) / 2;
       const imgY = 30;
-  
+
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
       pdf.save('invoice.pdf');
       setView(initialView);
     });
+    setLoading(false);
   };
-  
+  const [rPaymentValues, setRPaymentValues] = useState({
+    title: "",
+    purpose: "",
+    category: "",
+    platform: "",
+    date: "",
+    amount: "",
+
+  });
   const toastOptions = {
     position: "bottom-right",
     autoClose: 2000,
@@ -97,6 +112,8 @@ const Home = () => {
     progress: undefined,
     theme: "dark",
   };
+  const [showRPaymentModal, setShowRPaymentModal] = useState(false); // For recurring payment modal
+
   const [cUser, setcUser] = useState();
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -108,9 +125,52 @@ const Home = () => {
   const [endDate, setEndDate] = useState(null);
   const [view, setView] = useState("table");
 
+  const handleRPaymentClose = () => setShowRPaymentModal(false);
+  const handleRPaymentShow = () => setShowRPaymentModal(true);
+  const handleRPaymentChange = (e) => setRPaymentValues({ ...rPaymentValues, [e.target.name]: e.target.value });
+
   const handleStartChange = (date) => {
     setStartDate(date);
   };
+
+  const handleRPaymentSubmit = async (e) => {
+    e.preventDefault();
+    const { title, purpose, category, platform, amount, date } = rPaymentValues;
+
+    if (!title || !purpose || !category || !platform || !amount) {
+      toast.error("Please fill all fields", toastOptions);
+      return;
+    }
+    setLoading(true);
+
+    try {
+      // Placeholder for backend request to add recurring payment
+      const { data } = await axios.post(`${addRecurringPayment}`, {
+        title,
+        purpose,
+        category,
+        platform,
+        date,
+        amount,
+        userId: cUser._id,
+
+      });
+
+      if (data.success===true) {
+        toast.success("Recurring payment added successfully", toastOptions);
+        handleRPaymentClose();
+        setRefresh(!refresh);
+      } else {
+        toast.error("Failed to add recurring payment", toastOptions);
+      }
+    } catch (error) {
+      console.error("Error adding recurring payment:", error);
+      toast.error("An error occurred. Please try again.", toastOptions);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleEndChange = (date) => {
     setEndDate(date);
@@ -206,7 +266,7 @@ const Home = () => {
   };
 
 
-  
+
 
 
   useEffect(() => {
@@ -223,9 +283,9 @@ const Home = () => {
           type: type,
         });
         console.log(data);
-  
+
         setTransactions(data.transactions);
-  
+
         setLoading(false);
       } catch (err) {
         // toast.error("Error please Try again...", toastOptions);
@@ -247,7 +307,7 @@ const Home = () => {
     setView("rpay");
   };
 
-  
+
 
   return (
     <>
@@ -299,24 +359,21 @@ const Home = () => {
                 <FormatListBulletedIcon
                   sx={{ cursor: "pointer" }}
                   onClick={handleTableClick}
-                  className={`${
-                    view === "table" ? "iconActive" : "iconDeactive"
-                  }`}
+                  className={`${view === "table" ? "iconActive" : "iconDeactive"
+                    }`}
                 />
                 <BarChartIcon
                   sx={{ cursor: "pointer" }}
                   onClick={handleChartClick}
-                  className={`${
-                    view === "chart" ? "iconActive" : "iconDeactive"
-                  }`}
+                  className={`${view === "chart" ? "iconActive" : "iconDeactive"
+                    }`}
                 />
                 <AllInclusiveIcon
                   sx={{ cursor: "pointer" }}
                   onClick={handleRPayClick}
-                  className={`${
-                    view === "rpay" ? "iconActive" : "iconDeactive"
-                  }`}
-                />                
+                  className={`${view === "rpay" ? "iconActive" : "iconDeactive"
+                    }`}
+                />
               </div>
 
               <div>
@@ -326,6 +383,8 @@ const Home = () => {
                 <Button onClick={handleShow} className="mobileBtn">
                   +
                 </Button>
+                <Button onClick={handleRPaymentShow} style={{ marginLeft: '3rem' }} className="addNew">Add Recurring Payment</Button>
+
                 <Modal show={show} onHide={handleClose} centered>
                   <Modal.Header closeButton>
                     <Modal.Title>Add Transaction Details</Modal.Title>
@@ -415,7 +474,7 @@ const Home = () => {
                   <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                       Close
-                      
+
                     </Button>
                     <Button variant="primary" onClick={handleSubmit}>
                       Submit
@@ -464,13 +523,77 @@ const Home = () => {
               <></>
             )}
 
+            <Modal show={showRPaymentModal} onHide={handleRPaymentClose}>
+              <Modal.Header closeButton>
+                <Modal.Title>Add Recurring Payment</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Form onSubmit={handleRPaymentSubmit}>
+                  <Form.Group className="mb-3" controlId="formRPaymentTitle">
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control name="title" type="text" placeholder="Enter Title" value={rPaymentValues.title} onChange={handleRPaymentChange} />
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formRPaymentPurpose">
+                    <Form.Label>Purpose</Form.Label>
+                    <Form.Control name="purpose" type="text" placeholder="Enter Purpose" value={rPaymentValues.purpose} onChange={handleRPaymentChange} />
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formRPaymentCategory">
+                    <Form.Label>Category</Form.Label>
+                    <Form.Select name="category" value={rPaymentValues.category} onChange={handleRPaymentChange}>
+                      <option value="utensils">Utensils</option>
+                      <option value="food">Food</option>
+                      <option value="subscription">Subscription</option>
+                      <option value="entertainment">Entertainment</option>
+                      <option value="groceries">Groceries</option>
+                      <option value="education">Education</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="transportation">Transportation</option>
+                      <option value="utilities">Utilities</option>
+                      <option value="other">Other</option>
+                    </Form.Select>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="formRPaymentPlatform">
+                    <Form.Label>Platform</Form.Label>
+                    <Form.Select name="platform" value={rPaymentValues.platform} onChange={handleRPaymentChange}>
+                      <option value="netflix">Netflix</option>
+                      <option value="amazon">Amazon</option>
+                      <option value="aws">AWS</option>
+                      <option value="spotify">Spotify</option>
+                      <option value="hulu">Hulu</option>
+                      <option value="google-cloud">Google Cloud</option>
+                      <option value="apple-music">Apple Music</option>
+                      <option value="microsoft-365">Microsoft 365</option>
+                      <option value="disney-plus">Disney+</option>
+                      <option value="dropbox">Dropbox</option>
+                      <option value="zoom">Zoom</option>
+                    </Form.Select>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="formRPaymentAmount">
+                    <Form.Label>Amount</Form.Label>
+                    <Form.Control name="amount" type="number" placeholder="Enter Amount" value={rPaymentValues.amount} onChange={handleRPaymentChange} />
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formRPaymentDate">
+                    <Form.Label>Date</Form.Label>
+                    <Form.Control
+                      name="date"
+                      type="date"
+                      value={rPaymentValues.date}
+                      onChange={handleRPaymentChange}
+                    />
+                  </Form.Group>
+                  <Button variant="primary" type="submit">Add Recurring Payment</Button>
+                </Form>
+              </Modal.Body>
+            </Modal>
             <div className="containerBtn d-flex justify-content-center">
               <Button variant="primary" onClick={handleReset}>
                 Reset Filter
               </Button>
             </div>
             <div ref={pdfRef}>
-            {view === "table" ? (
+              {view === "table" ? (
                 <>
                   <TableData data={transactions} user={cUser} />
                 </>
@@ -480,7 +603,7 @@ const Home = () => {
                 </>
               ) : view === "rpay" ? (
                 <>
-                  <RecurringPaymentsTable/>
+                  <RecurringPaymentsTable />
                 </>
               ) : view === "both" ? (
                 <>
@@ -495,8 +618,8 @@ const Home = () => {
               <button className="btn btn-primary" onClick={downloadPDF}>
                 Download PDF
               </button>
-              <button className="btn btn-primary center " onClick={sendSms} style={{marginLeft:'3rem'}}>
-                Send SMS
+              <button className="btn btn-primary center " onClick={sendSms} style={{ marginLeft: '3rem' }}>
+                Send Email
               </button>
             </div>
             <ToastContainer />
