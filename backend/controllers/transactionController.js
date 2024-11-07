@@ -1,7 +1,7 @@
 import Transaction from "../models/TransactionModel.js";
 import User from "../models/UserSchema.js";
 import moment from "moment";
-
+import RequiringPayment from "../models/RequiredPaymentModel.js";
 export const addTransactionController = async (req, res) => {
   try {
     const {
@@ -64,6 +64,31 @@ export const addTransactionController = async (req, res) => {
     });
   }
 };
+
+export const AddRequiringPayment= async (req, res) => {
+  try {
+    const { title, purpose, category, platform, amount, date } = req.body;
+
+    // Create a new recurring payment entry
+    const newRecurringPayment = new RequiringPayment({
+      title,
+      purpose,
+      category,
+      platform,
+      amount,
+      date
+    });
+console.log("hi");
+    // Save to database
+    await newRecurringPayment.save();
+    res.status(201).json({      success: true,
+      message: 'Recurring payment added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error adding recurring payment' });
+  }
+};
+
 
 export const getAllTransactionController = async (req, res) => {
   try {
