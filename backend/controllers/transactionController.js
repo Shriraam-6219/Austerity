@@ -65,30 +65,6 @@ export const addTransactionController = async (req, res) => {
   }
 };
 
-export const AddRequiringPayment= async (req, res) => {
-  try {
-    const { title, purpose, category, platform, amount, date } = req.body;
-
-    // Create a new recurring payment entry
-    const newRecurringPayment = new RequiringPayment({
-      title,
-      purpose,
-      category,
-      platform,
-      amount,
-      date
-    });
-console.log("hi");
-    // Save to database
-    await newRecurringPayment.save();
-    res.status(201).json({      success: true,
-      message: 'Recurring payment added successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error adding recurring payment' });
-  }
-};
-
 
 export const getAllTransactionController = async (req, res) => {
   try {
@@ -248,5 +224,41 @@ export const updateTransactionController = async (req, res) => {
       success: false,
       messages: err.message,
     });
+  }
+};
+
+
+
+export const AddRequiringPayment= async (req, res) => {
+  try {
+    const { title, purpose, category, platform, amount, date,userId } = req.body;
+
+    // Create a new recurring payment entry
+    const newRecurringPayment = new RequiringPayment({
+      title,
+      purpose,
+      category,
+      platform,
+      amount,
+      date,
+      user:userId
+    });
+console.log("hi");
+    // Save to database
+    await newRecurringPayment.save();
+    res.status(201).json({      success: true,
+      message: 'Recurring payment added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error adding recurring payment' });
+  }
+};
+
+export const GetRequiringPayment= async(req,res)=>{
+  try{
+    
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Error adding recurring payment' });
   }
 };

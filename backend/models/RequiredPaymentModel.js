@@ -22,6 +22,10 @@ const RecurringPaymentSchema = new mongoose.Schema({
   },
   amount: { type: Number, required: true },
   date: { type: Date, required: true },
+    user:{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+  },
   submitDate: { type: Date, default: Date.now }
 });
 
