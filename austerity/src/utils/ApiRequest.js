@@ -10,3 +10,4 @@ export const sendMail = `${host}/api/v1/sendEmail`;
 export const deleteRecurringPayment=""; 
 export const editRecurringPayment="";
 export const addRecurringPayment=`${host}/api/v1/addreqpayment`;
+export const getRecurringPayment=`${host}/api/v1/getrequiringpayment`;

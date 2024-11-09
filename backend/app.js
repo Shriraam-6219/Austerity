@@ -8,7 +8,7 @@ import morgan from "morgan";
 import transactionRoutes from "./Routers/Transactions.js";
 import userRoutes from "./Routers/userRouter.js";
 import path from "path";
-
+import { GetRequiringPaymentMail } from "./controllers/transactionController.js";
 dotenv.config({ path: "./config/config.env" });
 const app = express();
 
@@ -46,4 +46,9 @@ app.get("/", (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is listening on http://localhost:${port}`);
+  setTimeout(() => {
+    console.log('Sending delayed email...');
+    GetRequiringPaymentMail();
+  }, 120); 
 });
+

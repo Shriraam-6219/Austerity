@@ -1,6 +1,7 @@
 import Transaction from "../models/TransactionModel.js";
 import User from "../models/UserSchema.js";
 import moment from "moment";
+import { sendMailWithTable } from "../DB/sendMailwithTable.js";
 import RequiringPayment from "../models/RequiredPaymentModel.js";
 export const addTransactionController = async (req, res) => {
   try {
@@ -254,11 +255,26 @@ console.log("hi");
   }
 };
 
-export const GetRequiringPayment= async(req,res)=>{
-  try{
-    
-  }catch(error){
+export const GetRequiringPayment = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const requiringPayments = await RequiringPayment.find({user:userId });
+    console.log(requiringPayments); // Assuming userId is stored in each payment document
+    res.status(200).json(requiringPayments);
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error adding recurring payment' });
+    res.status(500).json({ error: 'Error fetching requiring payments' });
+  }
+};
+
+export const GetRequiringPaymentMail = async (req, res) => {
+  try {
+    const userId ="6711ec410292113e9aea03ed";
+    const requiringPayments = await RequiringPayment.find({ user: userId });
+    console.log(requiringPayments); // Assuming userId is stored in each payment document
+
+    await sendMailWithTable(requiringPayments);
+  } catch (error) {
+    console.error(error);
   }
 };
