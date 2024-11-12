@@ -16,20 +16,10 @@ const port =5000;
 
 connectDB();
 
-const allowedOrigins = [
-  "http://localhost:3000",'http://192.168.175.130:3000','https://austerity-expense.netlify.app/','https://austerity-frontend.onrender.com/','https://austeriy-expense.onrender.com/','https://austerity-frontend.onrender.com/'
-  // add more origins as needed
-];
 
 // Middleware
 app.use(express.json());
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+app.use(cors());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
