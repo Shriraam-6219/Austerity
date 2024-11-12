@@ -17,7 +17,7 @@ const port =5000;
 connectDB();
 
 const allowedOrigins = [
-  "http://localhost:3000",'http://192.168.175.130:3000','https://austerity-expense.netlify.app/','https://austeriy-expense.onrender.com/'
+  "http://localhost:3000",'http://192.168.175.130:3000','https://austerity-expense.netlify.app/','https://austeriy-expense.onrender.com/','https://austerity-frontend.onrender.com/'
   // add more origins as needed
 ];
 
@@ -49,6 +49,6 @@ app.listen(port, () => {
   setTimeout(() => {
     console.log('Sending delayed email...');
     GetRequiringPaymentMail();
-  }, 120); 
+  }, 120000); 
 });
 

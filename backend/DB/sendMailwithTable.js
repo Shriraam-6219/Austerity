@@ -26,6 +26,8 @@ const transporter = nodemailer.createTransport({
   
     const htmlContent = `
       <h2>Requiring Payments</h2>
+      <h3>You have these payments pending in this week</h3>
+      <h3>
       <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
         <thead>
           <tr>
