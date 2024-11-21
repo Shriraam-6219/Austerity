@@ -12,6 +12,8 @@ import { GetRequiringPaymentMail } from "./controllers/transactionController.js"
 dotenv.config({ path: "./config/config.env" });
 const app = express();
 
+
+
 const port =5000;
 
 connectDB();
